@@ -39,56 +39,39 @@ public static class Horner
 		return factors.ToArray();
 	}
 
-	private static string ToString(List<List<string>> table) 
+	private static string ToString(List<List<string>> data) 
 	{
 		string output = "";
 		int max = -1;
 
-		for (int i = 0; i < table.Count; i++) 
+		for (int i = 0; i < data.Count; i++) 
 		{
-			for (int t = 0; t < table[i].Count; t++) 
+			for (int t = 0; t < data[i].Count; t++) 
 			{
-				max = Math.Max(max, table[i][t].Length);
+				max = Math.Max(max, data[i][t].Length);
 			}
 		}
 
 		max++;
-		for (int i = 0; i < table.Count; i++) 
+		for (int i = 0; i < data.Count; i++) 
 		{
-			for (int t = 0; t < table[i].Count; t++) 
+			for (int t = 0; t < data[i].Count; t++) 
 			{
 				if (i == 0 && t == 0) { output += new string(' ', max) + "|"; continue; }
 
-				string number = table[i][t];
+				string number = data[i][t];
 				if (number.Length < max) { output += new string(' ', max - number.Length); }
 				output += number;
 
 				if (t == 0) { output += "|"; }
-				if (t == table[i].Count - 1) { output += "\n"; }
+				if (t == data[i].Count - 1) { output += "\n"; }
 			}
 		}
 
 		return output;
 	}
 
-	// private static string AnswersToString(List<double> answers) 
-	// {
-	// 	string output = "";
-
-	// 	answers.Sort();
-	// 	for (int i = 0; i < answers.Count; i++) 
-	// 	{
-	// 		int count = 0;
-	// 		for (int t = i; t < answers.Count && answers[t] == answers[i]; t++) { count++; }
-
-	// 		output += "(x" + ((-answers[i] > 0) ? "+" : "") + (-answers[i]).ToString() + ")";
-	// 		if (count > 1) { output += "^" + count.ToString(); i += count - 1; }
-	// 	}
-
-	// 	return output;
-	// }
-
-	private static string Solve(string input, out double[] results, string values) 
+	public static string Solve(string input, string values, out double[] results) 
 	{
 		double[] coefficients = input
 			.Split(' ', ',')
@@ -146,57 +129,6 @@ public static class Horner
 		return ToString(table);
 	}
 
-	public static string Solve(string input, out double[] results) => Solve(input, out results, null);
-	public static string Solve(string input, string values = null) => Solve(input, out double[] results, values);
-
-	/*
-	public static bool Solve(string input, out string table, out string simplified) 
-	{
-		if (input[0] != '+' && input[0] != '-') { input = "+" + input; }
-
-		TokenDefinition[] definitions = 
-		{
-			new TokenDefinition("<=", "LTE", "<="),
-			new TokenDefinition(">=", "GTE", ">="),
-			new TokenDefinition("<", "LT", "<"),
-			new TokenDefinition(">", "GT", ">"),
-			new TokenDefinition("=", "EQUAL", "="),
-			new TokenDefinition("[+-][0-9]*(\\.[0-9]+)?([eE][+-][0-9]+)?", "NUMBER"),
-		};
-
-		List<double> answers = new List<double>();
-		List<List<string>> tableList = new List<List<string>>();
-		List<Token> tokens = Lexer.Lex(input, definitions);
-
-		double[] coefficients = tokens.Where(x => x.Name == "NUMBER").Select(x => double.Parse(x.Value)).ToArray();
-
-		List<string> row = new List<string>() { "-" };
-		row.AddRange(coefficients.Select(x => x.ToString()).ToArray());
-		tableList.Add(row);
-
-		double[] values = GetValues(coefficients[0], coefficients[coefficients.Length - 1]);
-		for (int i = 0; i < values.Length; i++) 
-		{
-			double[] newCoefficients;
-			if (CalculateValue(values[i], coefficients, out newCoefficients) == 0) 
-			{
-				coefficients = newCoefficients;
-				answers.Add(values[i]);
-
-				row = new List<string>() { Math.Round(values[i], 6).ToString() };
-				row.AddRange(newCoefficients.Select(x => Math.Round(x, 6).ToString()).ToArray());
-				row.Add("0");
-				tableList.Add(row);
-
-				i--;
-			}
-
-		}
-
-		table = ToString(tableList);
-		simplified = AnswersToString(answers) + " " + tokens[tokens.Count - 1].Value + " 0";
-
-		return true;
-	}
-	*/
+	public static string Solve(string input, out double[] results) => Solve(input, null, out results);
+	public static string Solve(string input, string values = null) => Solve(input, values, out double[] results);
 }
