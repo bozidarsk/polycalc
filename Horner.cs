@@ -71,41 +71,27 @@ public static class Horner
 		return output;
 	}
 
-	public static string Solve(string input, string values, out double[] results) 
+	public static string Solve(double[] input, double[] values, out double[] results) 
 	{
-		double[] coefficients = input
-			.Split(' ', ',')
-			.Where(x => !string.IsNullOrEmpty(x))
-			.Select(x => double.Parse(x))
-			.ToArray()
-		;
-
 		List<double> answers = new List<double>();
 		List<List<string>> table = new List<List<string>>();
 		List<string> row = new List<string>() { "-" };
 
-		row.AddRange(coefficients.Select(x => x.ToString()).ToArray());
+		row.AddRange(input.Select(x => x.ToString()).ToArray());
 		table.Add(row);
 
-		double[] numbers = (values != null) 
-			? values
-			.Split(' ', ',')
-			.Where(x => !string.IsNullOrEmpty(x))
-			.Select(x => double.Parse(x))
-			.ToArray()
-			: GetValues(coefficients[0], coefficients[coefficients.Length - 1])
-		;
+		values = values ?? GetValues(input[0], input[input.Length - 1]);
 
-		for (int i = 0; i < numbers.Length; i++) 
+		for (int i = 0; i < values.Length; i++) 
 		{
-			double r = CalculateValue(numbers[i], coefficients, out double[] newCoefficients);
+			double r = CalculateValue(values[i], input, out double[] newCoefficients);
 
 			if (r == 0 && values == null) 
 			{
-				coefficients = newCoefficients;
-				answers.Add(numbers[i]);
+				input = newCoefficients;
+				answers.Add(values[i]);
 
-				row = new List<string>() { Math.Round(numbers[i], 6).ToString() };
+				row = new List<string>() { Math.Round(values[i], 6).ToString() };
 				row.AddRange(newCoefficients.Select(x => Math.Round(x, 6).ToString()).ToArray());
 				table.Add(row);
 
@@ -115,9 +101,9 @@ public static class Horner
 
 			if (values != null) 
 			{
-				coefficients = newCoefficients;
+				input = newCoefficients;
 
-				row = new List<string>() { Math.Round(numbers[i], 6).ToString() };
+				row = new List<string>() { Math.Round(values[i], 6).ToString() };
 				row.AddRange(newCoefficients.Select(x => Math.Round(x, 6).ToString()).ToArray());
 				table.Add(row);
 
@@ -129,6 +115,33 @@ public static class Horner
 		return ToString(table);
 	}
 
-	public static string Solve(string input, out double[] results) => Solve(input, null, out results);
-	public static string Solve(string input, string values = null) => Solve(input, values, out double[] results);
+	public static string Solve(string input, out double[] results) => Solve(
+		input
+		.Split(' ', ',')
+		.Where(x => !string.IsNullOrEmpty(x))
+		.Select(x => double.Parse(x))
+		.ToArray(),
+		null,
+		out results
+	);
+
+	public static string Solve(string input, string values = null) => Solve(
+		input
+		.Split(' ', ',')
+		.Where(x => !string.IsNullOrEmpty(x))
+		.Select(x => double.Parse(x))
+		.ToArray(),
+		(values != null)
+		? values
+		.Split(' ', ',')
+		.Where(x => !string.IsNullOrEmpty(x))
+		.Select(x => double.Parse(x))
+		.ToArray()
+		: null,
+		out double[] results
+	);
+
+	public static string Solve(string input, string values, out double[] results) => Solve(input, values, out results);
+	public static string Solve(double[] input, out double[] results) => Solve(input, null, out results);
+	public static string Solve(double[] input, double[] values = null) => Solve(input, values, out double[] results);
 }
