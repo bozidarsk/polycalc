@@ -4,10 +4,10 @@ using System.Linq;
 
 public static class Horner 
 {
-	private static double CalculateValue(double value, double[] coefficients, out double[] newCoefficients) 
+	private static Fraction CalculateValue(Fraction value, Fraction[] coefficients, out Fraction[] newCoefficients) 
 	{
-		List<double> polynomial = new List<double>();
-		double number = coefficients[0];
+		List<Fraction> polynomial = new List<Fraction>();
+		Fraction number = coefficients[0];
 
 		polynomial.Add(number);
 		for (int i = 0; i < coefficients.Length - 1; i++) 
@@ -20,7 +20,7 @@ public static class Horner
 		return number;
 	}
 
-	private static double[] GetValues(double[] coefficients) 
+	private static Fraction[] GetValues(Fraction[] coefficients) 
 	{
 		Func<double, double[]> getFactors = (x) => 
 		{
@@ -29,19 +29,19 @@ public static class Horner
 			return list.ToArray();
 		};
 
-		List<double> values = new List<double>();
-		// if (coefficients.Last() == 0) { values.Add(0); }
+		List<Fraction> values = new List<Fraction>();
+		// if (coefficients.Last() == 0) { values.Add(new Fraction(0, 1)); }
 
-		double[] lasts = getFactors(coefficients.Last(x => x != 0));
+		double[] lasts = getFactors(coefficients.Last(x => x.Value != 0).Value);
 
-		if (coefficients[0] != 1 && coefficients[0] != -1) 
+		if (coefficients[0].Value != 1 && coefficients[0].Value != -1) 
 		{
-			double[] firsts = getFactors(coefficients[0]);
+			double[] firsts = getFactors(coefficients[0].Value);
 			Array.Sort(firsts);
 
-			for (int i = 0; i < firsts.Length / 2; i++) { values.AddRange(lasts.Select(x => x / firsts[i])); }
+			for (int i = 0; i < firsts.Length / 2; i++) { values.AddRange(lasts.Select(x => new Fraction(x, firsts[i]))); }
 		}
-		else { values.AddRange(lasts); }
+		else { values.AddRange(lasts.Select(x => new Fraction(x, 1))); }
 
 		return values.ToArray();
 	}
@@ -78,9 +78,9 @@ public static class Horner
 		return output;
 	}
 
-	public static string Solve(double[] input, double[] values, out double[] results) 
+	public static string Solve(Fraction[] input, Fraction[] values, out Fraction[] results) 
 	{
-		List<double> answers = new List<double>();
+		List<Fraction> answers = new List<Fraction>();
 		List<List<string>> table = new List<List<string>>();
 		List<string> row = new List<string>() { "-" };
 
@@ -92,26 +92,26 @@ public static class Horner
 
 		for (int i = 0; i < values.Length; i++) 
 		{
-			double r = CalculateValue(values[i], input, out double[] newCoefficients);
+			Fraction r = CalculateValue(values[i], input, out Fraction[] newCoefficients);
 
 			if (all) 
 			{
 				answers.Add(values[i]);
 
-				row = new List<string>() { Math.Round(values[i], 6).ToString() };
-				row.AddRange(newCoefficients.Select(x => Math.Round(x, 6).ToString()).ToArray());
+				row = new List<string>() { values[i].ToString() };
+				row.AddRange(newCoefficients.Select(x => x.ToString()).ToArray());
 				table.Add(row);
 
 				continue;
 			}
 
-			if (r == 0 && !all) 
+			if (r.Value == 0 && !all) 
 			{
 				input = newCoefficients;
 				answers.Add(values[i]);
 
-				row = new List<string>() { Math.Round(values[i], 6).ToString() };
-				row.AddRange(newCoefficients.Select(x => Math.Round(x, 6).ToString()).ToArray());
+				row = new List<string>() { values[i].ToString() };
+				row.AddRange(newCoefficients.Select(x => x.ToString()).ToArray());
 				table.Add(row);
 
 				i--;
@@ -123,11 +123,11 @@ public static class Horner
 		return ToString(table);
 	}
 
-	public static string Solve(string input, out double[] results) => Solve(
+	public static string Solve(string input, out Fraction[] results) => Solve(
 		input
 		.Split(' ', ',')
 		.Where(x => !string.IsNullOrEmpty(x))
-		.Select(x => double.Parse(x))
+		.Select(x => new Fraction(double.Parse(x), 1))
 		.ToArray(),
 		null,
 		out results
@@ -137,19 +137,19 @@ public static class Horner
 		input
 		.Split(' ', ',')
 		.Where(x => !string.IsNullOrEmpty(x))
-		.Select(x => double.Parse(x))
+		.Select(x => new Fraction(double.Parse(x), 1))
 		.ToArray(),
 		(values != null)
 		? values
 		.Split(' ', ',')
 		.Where(x => !string.IsNullOrEmpty(x))
-		.Select(x => double.Parse(x))
+		.Select(x => new Fraction(double.Parse(x), 1))
 		.ToArray()
 		: null,
-		out double[] results
+		out Fraction[] results
 	);
 
-	public static string Solve(string input, string values, out double[] results) => Solve(input, values, out results);
-	public static string Solve(double[] input, out double[] results) => Solve(input, null, out results);
-	public static string Solve(double[] input, double[] values = null) => Solve(input, values, out double[] results);
+	public static string Solve(string input, string values, out Fraction[] results) => Solve(input, values, out results);
+	public static string Solve(Fraction[] input, out Fraction[] results) => Solve(input, null, out results);
+	public static string Solve(Fraction[] input, Fraction[] values = null) => Solve(input, values, out Fraction[] results);
 }
