@@ -8,8 +8,8 @@ public static class Horner
 	{
 		List<double> polynomial = new List<double>();
 		double number = coefficients[0];
-		polynomial.Add(number);
 
+		polynomial.Add(number);
 		for (int i = 0; i < coefficients.Length - 1; i++) 
 		{
 			number = number * value + coefficients[i + 1];
@@ -20,7 +20,7 @@ public static class Horner
 		return number;
 	}
 
-	private static double[] GetValues(double first, double last) 
+	private static double[] GetValues(double[] coefficients) 
 	{
 		Func<double, double[]> getFactors = (x) => 
 		{
@@ -29,14 +29,21 @@ public static class Horner
 			return list.ToArray();
 		};
 
-		List<double> factors = new List<double>();
-		double[] firsts = getFactors(first);
-		double[] lasts = getFactors(last);
+		List<double> values = new List<double>();
+		// if (coefficients.Last() == 0) { values.Add(0); }
 
-		Array.Sort(firsts);
-		for (int i = 0; i < firsts.Length / 2; i++) { factors.AddRange(lasts.Select(x => x / firsts[i])); }
+		double[] lasts = getFactors(coefficients.Last(x => x != 0));
 
-		return factors.ToArray();
+		if (coefficients[0] != 1 && coefficients[0] != -1) 
+		{
+			double[] firsts = getFactors(coefficients[0]);
+			Array.Sort(firsts);
+
+			for (int i = 0; i < firsts.Length / 2; i++) { values.AddRange(lasts.Select(x => x / firsts[i])); }
+		}
+		else { values.AddRange(lasts); }
+
+		return values.ToArray();
 	}
 
 	private static string ToString(List<List<string>> data) 
@@ -80,13 +87,25 @@ public static class Horner
 		row.AddRange(input.Select(x => x.ToString()).ToArray());
 		table.Add(row);
 
-		values = values ?? GetValues(input[0], input[input.Length - 1]);
+		bool all = values != null;
+		values = values ?? GetValues(input);
 
 		for (int i = 0; i < values.Length; i++) 
 		{
 			double r = CalculateValue(values[i], input, out double[] newCoefficients);
 
-			if (r == 0 && values == null) 
+			if (all) 
+			{
+				answers.Add(values[i]);
+
+				row = new List<string>() { Math.Round(values[i], 6).ToString() };
+				row.AddRange(newCoefficients.Select(x => Math.Round(x, 6).ToString()).ToArray());
+				table.Add(row);
+
+				continue;
+			}
+
+			if (r == 0 && !all) 
 			{
 				input = newCoefficients;
 				answers.Add(values[i]);
@@ -96,17 +115,6 @@ public static class Horner
 				table.Add(row);
 
 				i--;
-				continue;
-			}
-
-			if (values != null) 
-			{
-				input = newCoefficients;
-
-				row = new List<string>() { Math.Round(values[i], 6).ToString() };
-				row.AddRange(newCoefficients.Select(x => Math.Round(x, 6).ToString()).ToArray());
-				table.Add(row);
-
 				continue;
 			}
 		}
