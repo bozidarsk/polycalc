@@ -58,7 +58,7 @@ public static class NewtonsMethod
 			diff = result - current;
 			result = current;
 
-			output += $"x{index++} = {current.Value}\n";
+			output += $"x{++index} = {current.Value}\n";
 		}
 
 		return $"value = {value}\n" + output;
