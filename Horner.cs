@@ -41,7 +41,7 @@ public static class Horner
 
 			for (int i = 0; i < firsts.Length / 2; i++) { values.AddRange(lasts.Select(x => new Fraction(x, firsts[i]))); }
 		}
-		else { values.AddRange(lasts.Select(x => new Fraction(x, 1))); }
+		else { values.AddRange(lasts.Select(x => (Fraction)x)); }
 
 		return values.ToArray();
 	}
@@ -127,7 +127,7 @@ public static class Horner
 		input
 		.Split(' ', ',')
 		.Where(x => !string.IsNullOrEmpty(x))
-		.Select(x => new Fraction(double.Parse(x), 1))
+		.Select(x => (Fraction)double.Parse(x))
 		.ToArray(),
 		null,
 		out results
@@ -137,13 +137,13 @@ public static class Horner
 		input
 		.Split(' ', ',')
 		.Where(x => !string.IsNullOrEmpty(x))
-		.Select(x => new Fraction(double.Parse(x), 1))
+		.Select(x => (Fraction)double.Parse(x))
 		.ToArray(),
 		(values != null)
 		? values
 		.Split(' ', ',')
 		.Where(x => !string.IsNullOrEmpty(x))
-		.Select(x => new Fraction(double.Parse(x), 1))
+		.Select(x => (Fraction)double.Parse(x))
 		.ToArray()
 		: null,
 		out Fraction[] results

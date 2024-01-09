@@ -73,4 +73,7 @@ public static class NewtonsMethod
 		out result,
 		value
 	);
+
+	public static string Solve(Fraction[] coefficients, double value = 0) => Solve(coefficients, out Fraction result, value);
+	public static string Solve(string input, double value = 0) => Solve(input, out Fraction result, value);
 }

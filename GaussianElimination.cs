@@ -85,7 +85,7 @@ public static class GaussainElimination
 		.Select(r => r
 			.Split(' ', ',')
 			.Where(c => !string.IsNullOrEmpty(c))
-			.Select(c => new Fraction(double.Parse(c), 1))
+			.Select(c => (Fraction)double.Parse(c))
 			.ToArray()
 		)
 		.ToList(),
