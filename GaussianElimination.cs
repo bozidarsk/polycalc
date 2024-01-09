@@ -104,4 +104,7 @@ public static class GaussainElimination
 
 		return Solve(list, out results);
 	}
+
+	public static string Solve(string input) => Solve(input, out Fraction[] results);
+	public static string Solve(double[,] input) => Solve(input, out Fraction[] results);
 }
