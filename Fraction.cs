@@ -1,11 +1,14 @@
 using System;
 
-public sealed class Fraction 
+public struct Fraction 
 {
 	private double a, b;
 
 	public double Value { get => a / b; }
 	public bool IsNegative { get => (((a < 0) ? 1 : 0) ^ ((b < 0) ? 1 : 0)) == 1; }
+
+	public static explicit operator Fraction(double x) => new Fraction(x, 1);
+	public static explicit operator double(Fraction x) => x.Value;
 
 	public static Fraction operator + (Fraction f) => new Fraction(f.a, f.b);
 	public static Fraction operator - (Fraction f) => new Fraction(-f.a, f.b);
