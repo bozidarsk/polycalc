@@ -10,6 +10,12 @@ public struct Fraction
 	public static explicit operator Fraction(double x) => new Fraction(x, 1);
 	public static explicit operator double(Fraction x) => x.Value;
 
+	public static bool operator == (Fraction l, Fraction r) => l.Value == r.Value;
+	public static bool operator != (Fraction l, Fraction r) => l.Value != r.Value;
+
+	public override bool Equals(object other) => (other is Fraction) ? (Fraction)other == this : false;
+	public override int GetHashCode() => this.Value.GetHashCode();
+
 	public static Fraction operator + (Fraction f) => new Fraction(f.a, f.b);
 	public static Fraction operator - (Fraction f) => new Fraction(-f.a, f.b);
 
